@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Spectre</title>
+    <link href="css/audio.css" rel="stylesheet" />
+    <style>
+      .label {
+        width: 100%;
+      }
+
+      .slider {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <span class="title">Spectre</span>
+    </div>
+    <div>
+      <div>
+        <span class="label">Gain
+          <span id="gain-display">db</span>
+        </span>
+      </div>
+
+      <div>
+        <span class="label">Visualiseur de fréquence</span>
+      </div>
+      <canvas id="visualizer" width="auto" height="100"></canvas>
+    </div>
+  </body>
+
+  <script type="text/javascript" src="js/audio-helper.js"></script>
+  <script type="text/javascript" src="js/frequency-visualizer.js"></script>
+  <script type="text/javascript">
+
+    (function () {
+      var context = new AudioContext();
+      var visCanvas = document.getElementById('visualizer')
+      var visualizer = new App.FrequencyVisualizer(context, visCanvas);
+      var gain = 20;  // Gain initial en pourcentage (max 100%)
+      var audioSource
+
+      navigator.getUserMedia =
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia;
+
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia (
+          {
+            audio: true,
+            video: false
+          },
+          function (stream) {
+            audioSource = context.createMediaStreamSource(stream);
+            visualizer.acceptConnection(audioSource);
+          },
+          function (err) {
+            console.log('Error initializing user media stream: ' + err);
+          }
+        );
+      }
+
+      // Visualisation du Gain
+      visualizer.gain = gain;
+      var gainDisplay = document.getElementById('gain-display');
+      gainDisplay.textContent = gain + ' db';
+
+    })();
+
+  </script>
+</html>
